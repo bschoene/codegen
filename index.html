@@ -23,29 +23,6 @@
 	
 	<div class="container">
 		<div id="sections">
-			<div id="section0">
-				<legend>Sektion 1: <input type="text" class="form-control"></legend>
-				<div class="row lead">
-					<div class="col-md-3">Bezeichnung</div>
-					<div class="col-md-1">Type</div>
-					<div class="col-md-1">Pflichtfeld</div>
-					<div class="col-md-5">Optionen</div>
-				</div>
-				<div id="fields"></div>
-				<form id="newfield">
-					<div class="row" style="margin-top: 20px;">
-						<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
-						<div class="col-md-1"><select id="type" class="form-control">
-												<option></option>
-												<option>text</option>
-												<option value="select">select</option>
-											  </select></div>
-						<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
-						<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
-						<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
-					</div>
-				</form>
-			</div>
 		</div>
 		<hr>
 		<div class="row">
@@ -56,45 +33,83 @@
 </div>
 
 <!-- Patterns Start -->
-<div id="fieldpattern" class="row" style="">
-	<div id="label" class="col-md-3"></div>
-	<div id="type" class="col-md-1"></div>
-	<div id="mandatory" class="col-md-1"></div>
-	<div id="options" class="col-md-5"></div>
-</div>
-
-
-<div id="sectionpattern" style="display: none;">
-	<legend>Sektion 1: <input type="text" class="form-control"></legend>
-	<div class="row lead">
-		<div class="col-md-3">Bezeichnung</div>
-		<div class="col-md-1">Type</div>
-		<div class="col-md-1">Pflichtfeld</div>
-		<div class="col-md-5">Optionen</div>
+<div id="patterns" style="display: none;">
+	<div id="fieldpattern" class="row">
+		<div id="label" class="col-md-3"></div>
+		<div id="type" class="col-md-1"></div>
+		<div id="mandatory" class="col-md-1"></div>
+		<div id="options" class="col-md-5"></div>
 	</div>
-	<div id="fields"></div>
-	<form id="newfield">
-		<div class="row" style="margin-top: 20px;">
-			<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
-			<div class="col-md-1"><select id="type" class="form-control">
-									<option></option>
-									<option>text</option>
-									<option value="select">select</option>
-								  </select></div>
-			<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
-			<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
-			<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
+	
+	<div id="sectionpattern" style="margin-bottom: 50px;">
+		<legend><span>Sektion 1:</span> <input type="text" class="form-control"></legend>
+		<div class="row lead">
+			<div class="col-md-3">Bezeichnung</div>
+			<div class="col-md-1">Type</div>
+			<div class="col-md-1">Pflichtfeld</div>
+			<div class="col-md-5">Optionen</div>
 		</div>
-	</form>
+		<div id="fields"></div>
+		<form id="newfield">
+			<div class="row" style="margin-top: 20px;">
+				<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
+				<div class="col-md-1"><select id="type" class="form-control">
+										<option></option>
+										<option>text</option>
+										<option value="select">select</option>
+									  </select></div>
+				<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
+				<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
+				<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
+			</div>
+		</form>
+	</div>
 </div>
 <!-- Patterns End -->
+
+
+
 <script type="text/javascript">
+function setSectionLabel() {
+	$("#section" + sectionno + " legend").text("Sektion " + sectionno);
+}
+
 $("button#newsection").click(function() {
-	$("#section0 #newfield").remove();
+	sectionno++;
+	var sectionbefore = sectionno-1;
+	$("#section" + sectionbefore + " #newfield").remove();
+	$("#sectionpattern").clone().appendTo("#sections");
+	$("#sections #sectionpattern").attr("id","section"+sectionno);
+	setSectionLabel();
+	$("#section" + sectionno + " #addfield").click(function(){
+		addnewfield();
+	});
+	$("select#type").change(function(){
+		if($("select#type").val() == 'select'){
+			$("input#options").css("display","block");
+		}
+	})
 });
 
 var sectionno = 0;
 var fieldno   = 0;
+
+function copyItemsToDiv() {
+	var label = $("input#label").val();
+	var type  = $("select#type").val();
+	var mandatory = $("input#mandatory:checked").val();
+	var options = $("input#options").val();
+	
+	if(mandatory == "on") {
+		mandatory = "JA";
+	}
+	
+	$("#section" + sectionno +" #field" + fieldno + " #label").text(label);
+	$("#section" + sectionno +" #field" + fieldno + " #type").text(type);
+	$("#section" + sectionno +" #field" + fieldno + " #mandatory").text(mandatory);
+	$("#section" + sectionno +" #field" + fieldno + " #options").text(options);
+	alert("#section" + sectionno +" #field" + fieldno + " #options");
+}
 
 //Resets given form
 function resetForm(element) {
@@ -104,11 +119,7 @@ function resetForm(element) {
 }
 
 //Fieldtype: 'select' selected > show options input
-$("select#type").change(function(){
-	if($("select#type").val() == 'select'){
-		$("input#options").css("display","block");
-	}
-})
+
 
 //Click button 'Formularfeld anlegen'
 //	- clones div model 'fieldnew'
@@ -116,15 +127,16 @@ $("select#type").change(function(){
 //	- hides options input
 //	- 
 //	- delete
-$("#addfield").click(function(){
-	$("#fieldpattern").clone().appendTo("#fields");
+
+function addnewfield() {
+	$("#fieldpattern").clone().appendTo("#section" + sectionno +" #fields");
 	$("#fields #fieldpattern").attr("id","field" + fieldno);
 	copyItemsToDiv();
 	resetForm("form#newfield");
 	$("input#options").css("display","none");
 	$("input#label").focus();
 	fieldno++;
-});
+}
 </script>
 </body>
 </html>

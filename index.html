@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TMS: Generator Anmeldeformular</title>
+
+<link rel="stylesheet" href="css/bootstrap.min.css" media="all">
+<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+<script src="lib/jquery-2.0.3.min.js"></script>
+<script src="lib/bootstrap.min.js"></script>
+<script src="script.js"></script>
+
+</head>
+
+<body>
+<div class="wrap">
+	<header id="js-header-main" class="header-main">
+		<div class="container">
+			<h1>Ticketmanagementsystem: Anmeldeformular erstellen</h1>
+		</div>
+	</header>
+	
+	<div class="container">
+		<div id="sections">
+			<div id="section0">
+				<legend>Sektion 1: <input type="text" class="form-control"></legend>
+				<div class="row lead">
+					<div class="col-md-3">Bezeichnung</div>
+					<div class="col-md-1">Type</div>
+					<div class="col-md-1">Pflichtfeld</div>
+					<div class="col-md-5">Optionen</div>
+				</div>
+				<div id="fields"></div>
+				<form id="newfield">
+					<div class="row" style="margin-top: 20px;">
+						<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
+						<div class="col-md-1"><select id="type" class="form-control">
+												<option></option>
+												<option>text</option>
+												<option value="select">select</option>
+											  </select></div>
+						<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
+						<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
+						<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-3"><button id="newsection" class="form-control btn btn-success">Neue Sektion erstellen</button></div>
+			<div class="col-md-3"><button id="generate" class="form-control btn btn-danger">XML-Model generieren</button></div>
+		</div>
+	</div>
+</div>
+
+<!-- Patterns Start -->
+<div id="fieldpattern" class="row" style="">
+	<div id="label" class="col-md-3"></div>
+	<div id="type" class="col-md-1"></div>
+	<div id="mandatory" class="col-md-1"></div>
+	<div id="options" class="col-md-5"></div>
+</div>
+
+
+<div id="sectionpattern" style="display: none;">
+	<legend>Sektion 1: <input type="text" class="form-control"></legend>
+	<div class="row lead">
+		<div class="col-md-3">Bezeichnung</div>
+		<div class="col-md-1">Type</div>
+		<div class="col-md-1">Pflichtfeld</div>
+		<div class="col-md-5">Optionen</div>
+	</div>
+	<div id="fields"></div>
+	<form id="newfield">
+		<div class="row" style="margin-top: 20px;">
+			<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
+			<div class="col-md-1"><select id="type" class="form-control">
+									<option></option>
+									<option>text</option>
+									<option value="select">select</option>
+								  </select></div>
+			<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
+			<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
+			<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
+		</div>
+	</form>
+</div>
+<!-- Patterns End -->
+<script type="text/javascript">
+$("button#newsection").click(function() {
+	$("#section0 #newfield").remove();
+});
+
+var sectionno = 0;
+var fieldno   = 0;
+
+//Resets given form
+function resetForm(element) {
+	$(element).each(function(){
+		this.reset();
+	});
+}
+
+//Fieldtype: 'select' selected > show options input
+$("select#type").change(function(){
+	if($("select#type").val() == 'select'){
+		$("input#options").css("display","block");
+	}
+})
+
+//Click button 'Formularfeld anlegen'
+//	- clones div model 'fieldnew'
+//	- change id to 'field[n]'
+//	- hides options input
+//	- 
+//	- delete
+$("#addfield").click(function(){
+	$("#fieldpattern").clone().appendTo("#fields");
+	$("#fields #fieldpattern").attr("id","field" + fieldno);
+	copyItemsToDiv();
+	resetForm("form#newfield");
+	$("input#options").css("display","none");
+	$("input#label").focus();
+	fieldno++;
+});
+</script>
+</body>
+</html>

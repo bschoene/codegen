@@ -22,8 +22,7 @@
 	</header>
 	
 	<div class="container">
-		<div id="sections">
-		</div>
+		<div id="sections"><!-- Sektionen werden hier eingefügt: Klick 'Neue Sektion erstellen' --></div>
 		<hr>
 		<div class="row">
 			<div class="col-md-3"><button id="newsection" class="form-control btn btn-success">Neue Sektion erstellen</button></div>
@@ -32,15 +31,11 @@
 	</div>
 </div>
 
+
 <!-- Patterns Start -->
 <div id="patterns" style="display: none;">
-	<div id="fieldpattern" class="row">
-		<div id="label" class="col-md-3"></div>
-		<div id="type" class="col-md-1"></div>
-		<div id="mandatory" class="col-md-1"></div>
-		<div id="options" class="col-md-5"></div>
-	</div>
-	
+
+	<!-- sectionpattern: Muster für eine Sektion -->
 	<div id="sectionpattern" style="margin-bottom: 50px;">
 		<legend><span>Sektion 1:</span> <input type="text" class="form-control"></legend>
 		<div class="row lead">
@@ -49,7 +44,8 @@
 			<div class="col-md-1">Pflichtfeld</div>
 			<div class="col-md-5">Optionen</div>
 		</div>
-		<div id="fields"></div>
+		<div id="fields"><!-- Felder werden hier eingefügt: Klick 'Formularfeld anlegen' --></div>
+		<!-- newfield: Formular zum eingeben von Informationen zum Formularfeld -->
 		<form id="newfield">
 			<div class="row" style="margin-top: 20px;">
 				<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
@@ -64,23 +60,32 @@
 			</div>
 		</form>
 	</div>
+
+	<!-- fieldpattern: Muster für einen Datensatz zu einem Formularfeld -->
+	<div id="fieldpattern" class="row">
+		<div id="label" class="col-md-3"></div>
+		<div id="type" class="col-md-1"></div>
+		<div id="mandatory" class="col-md-1"></div>
+		<div id="options" class="col-md-5"></div>
+	</div>
 </div>
 <!-- Patterns End -->
 
 
 
 <script type="text/javascript">
-function setSectionLabel() {
-	$("#section" + sectionno + " legend").text("Sektion " + sectionno);
-}
 
+var sectionno = 0;	//Zähler für Sektionen
+var fieldno   = 0;	//Zähler für Feldnummern
+
+//Klick auf 'Neue Sektion erstellen'
 $("button#newsection").click(function() {
 	sectionno++;
 	var sectionbefore = sectionno-1;
 	$("#section" + sectionbefore + " #newfield").remove();
 	$("#sectionpattern").clone().appendTo("#sections");
 	$("#sections #sectionpattern").attr("id","section"+sectionno);
-	setSectionLabel();
+	$("#section" + sectionno + " legend").text("Sektion " + sectionno);
 	$("#section" + sectionno + " #addfield").click(function(){
 		addnewfield();
 	});
@@ -90,26 +95,6 @@ $("button#newsection").click(function() {
 		}
 	})
 });
-
-var sectionno = 0;
-var fieldno   = 0;
-
-function copyItemsToDiv() {
-	var label = $("input#label").val();
-	var type  = $("select#type").val();
-	var mandatory = $("input#mandatory:checked").val();
-	var options = $("input#options").val();
-	
-	if(mandatory == "on") {
-		mandatory = "JA";
-	}
-	
-	$("#section" + sectionno +" #field" + fieldno + " #label").text(label);
-	$("#section" + sectionno +" #field" + fieldno + " #type").text(type);
-	$("#section" + sectionno +" #field" + fieldno + " #mandatory").text(mandatory);
-	$("#section" + sectionno +" #field" + fieldno + " #options").text(options);
-	alert("#section" + sectionno +" #field" + fieldno + " #options");
-}
 
 //Resets given form
 function resetForm(element) {
@@ -127,7 +112,6 @@ function resetForm(element) {
 //	- hides options input
 //	- 
 //	- delete
-
 function addnewfield() {
 	$("#fieldpattern").clone().appendTo("#section" + sectionno +" #fields");
 	$("#fields #fieldpattern").attr("id","field" + fieldno);
@@ -136,6 +120,23 @@ function addnewfield() {
 	$("input#options").css("display","none");
 	$("input#label").focus();
 	fieldno++;
+}
+
+//Kopiert die eingegebenen Informationen in das neu angelegte Feld einer Sektion
+function copyItemsToDiv() {
+	var label = $("input#label").val();
+	var type  = $("select#type").val();
+	var mandatory = $("input#mandatory:checked").val();
+	var options = $("input#options").val();
+	
+	if(mandatory == "on") {
+		mandatory = "JA";
+	}
+	
+	$("#section" + sectionno +" #field" + fieldno + " #label").text(label);
+	$("#section" + sectionno +" #field" + fieldno + " #type").text(type);
+	$("#section" + sectionno +" #field" + fieldno + " #mandatory").text(mandatory);
+	$("#section" + sectionno +" #field" + fieldno + " #options").text(options);
 }
 </script>
 </body>

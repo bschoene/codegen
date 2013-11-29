@@ -40,22 +40,22 @@
 		<legend><span>Sektion 1:</span> <input type="text" class="form-control"></legend>
 		<div class="row lead">
 			<div class="col-md-3">Bezeichnung</div>
-			<div class="col-md-1">Type</div>
+			<div class="col-md-2">Type</div>
 			<div class="col-md-1">Pflichtfeld</div>
-			<div class="col-md-5">Optionen</div>
+			<div class="col-md-4">Optionen</div>
 		</div>
 		<div id="fields"><!-- Felder werden hier eingefügt: Klick 'Formularfeld anlegen' --></div>
 		<!-- newfield: Formular zum eingeben von Informationen zum Formularfeld -->
 		<form id="newfield">
 			<div class="row" style="margin-top: 20px;">
 				<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
-				<div class="col-md-1"><select id="type" class="form-control">
+				<div class="col-md-2"><select id="type" class="form-control">
 										<option></option>
 										<option>text</option>
 										<option value="select">select</option>
 									  </select></div>
 				<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
-				<div class="col-md-5"><input id="options" type="text" class="form-control" style="display: none;"></div>
+				<div class="col-md-4"><input id="options" type="text" class="form-control" style="display: none;"></div>
 				<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
 			</div>
 		</form>
@@ -71,6 +71,12 @@
 </div>
 <!-- Patterns End -->
 
+<!-- Formular - Datensätze sammeln -->
+<form id="collect" action="generate.php" method="get6">
+
+</form>
+<!-- End Formular -->
+
 
 
 <script type="text/javascript">
@@ -78,11 +84,16 @@
 var sectionno = 0;	//Zähler für Sektionen
 var fieldno   = 0;	//Zähler für Feldnummern
 
+//Klick auf 'XML-Model generieren'
+$("button#generate").click(function() {
+	$("#collect").submit();
+});
+
 //Klick auf 'Neue Sektion erstellen'
 $("button#newsection").click(function() {
 	sectionno++;
-	var sectionbefore = sectionno-1;
 	$("#section" + sectionbefore + " #newfield").remove();
+	var sectionbefore = sectionno-1;
 	$("#sectionpattern").clone().appendTo("#sections");
 	$("#sections #sectionpattern").attr("id","section"+sectionno);
 	$("#section" + sectionno + " legend").text("Sektion " + sectionno);
@@ -113,13 +124,13 @@ function resetForm(element) {
 //	- 
 //	- delete
 function addnewfield() {
+	fieldno++;
 	$("#fieldpattern").clone().appendTo("#section" + sectionno +" #fields");
 	$("#fields #fieldpattern").attr("id","field" + fieldno);
 	copyItemsToDiv();
 	resetForm("form#newfield");
 	$("input#options").css("display","none");
 	$("input#label").focus();
-	fieldno++;
 }
 
 //Kopiert die eingegebenen Informationen in das neu angelegte Feld einer Sektion
@@ -128,15 +139,19 @@ function copyItemsToDiv() {
 	var type  = $("select#type").val();
 	var mandatory = $("input#mandatory:checked").val();
 	var options = $("input#options").val();
-	
 	if(mandatory == "on") {
-		mandatory = "JA";
+		mandatory = "1";
+	} else {
+		mandatory = "0";
 	}
-	
 	$("#section" + sectionno +" #field" + fieldno + " #label").text(label);
 	$("#section" + sectionno +" #field" + fieldno + " #type").text(type);
 	$("#section" + sectionno +" #field" + fieldno + " #mandatory").text(mandatory);
 	$("#section" + sectionno +" #field" + fieldno + " #options").text(options);
+	$("#collect").append('<input type="hidden" name="'+sectionno+'label'+fieldno+'" value="'+label+'">').append();
+	$("#collect").append('<input type="hidden" name="'+sectionno+'type'+fieldno+'" value="'+type+'">');
+	$("#collect").append('<input type="hidden" name="'+sectionno+'mandatory'+fieldno+'" value="'+mandatory+'">');
+	$("#collect").append('<input type="hidden" name="'+sectionno+'options'+fieldno+'" value="'+options+'">');
 }
 </script>
 </body>

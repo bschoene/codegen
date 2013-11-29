@@ -9,7 +9,7 @@
 
 <script src="lib/jquery-2.0.3.min.js"></script>
 <script src="lib/bootstrap.min.js"></script>
-<script src="script.js"></script>
+<script src="lib/modal.js"></script>
 
 </head>
 
@@ -78,6 +78,26 @@
 <!-- End Formular -->
 
 
+<!-- Lightbox start -->
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 936px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h1>XML-Model</h41>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- Lightbox end -->
 
 <script type="text/javascript">
 
@@ -86,7 +106,16 @@ var fieldno   = 0;	//Zähler für Feldnummern
 
 //Klick auf 'XML-Model generieren'
 $("button#generate").click(function() {
-	$("#collect").submit();
+	$('#myModal').modal('show');
+	$.ajax({
+		  type: "GET",
+		  url: "generate.php",
+		  data:  $('#collect').serialize(),
+		  success: function (result) {
+			$('.modal-body').html(result);
+	      }
+		})
+	//$("#collect").submit();
 });
 
 //Klick auf 'Neue Sektion erstellen'

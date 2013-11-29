@@ -1,15 +1,13 @@
 <?php
 
-// print_r($_GET);
-
-$get = $_GET;
+$raw_data = $_GET;
 
 $sections = array();
 $matches = array();
 $info    = array();
 
 //Sort 
-foreach($get as $key=>$value)
+foreach($raw_data as $key=>$value)
 {
 	if(!empty($value))
 	{
@@ -22,13 +20,12 @@ foreach($get as $key=>$value)
 	}
 }
 
-// print_r($sections);
-
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-echo "<form>\n";
+$output="";
+$output.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+$output.="<form>\n";
 foreach($sections as $section)
 {
-		echo "\t<section>\n";
+		$output.="\t<section>\n";
 	
 	foreach($section as $field)
 	{
@@ -37,22 +34,25 @@ foreach($sections as $section)
 		{
 			if($tag == "label")
 			{
-				echo "\t\t<$information>\n";
+				$output.="\t\t<$information>\n";
 				$label = $information;
 			}
 			else
 			{			
-				echo "\t\t\t<$tag>$information</$tag>\n";
+				$output.="\t\t\t<$tag>$information</$tag>\n";
 			}
 			
 		}
-		echo "\t\t</$label>\n";
+		$output.="\t\t</$label>\n";
 	}
-	echo "\t</section>\n";
+	$output.="\t</section>\n";
 }
-	echo "</form>";
+$output.="</form>";
 
-
+$output=htmlspecialchars($output);
+$output = str_replace("\n","<br />",$output);
+$output = str_replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;",$output);
+$output = "<code>$output</code>";
+echo $output;
 
 ?>
-

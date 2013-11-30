@@ -37,7 +37,7 @@
 
 	<!-- sectionpattern: Muster für eine Sektion -->
 	<div id="sectionpattern" style="margin-bottom: 50px;">
-		<legend><span>Sektion 1:</span> <input type="text" class="form-control"></legend>
+		<legend><span>Sektion 1</span></legend>
 		<div class="row lead">
 			<div class="col-md-3">Bezeichnung</div>
 			<div class="col-md-2">Type</div>
@@ -64,9 +64,9 @@
 	<!-- fieldpattern: Muster für einen Datensatz zu einem Formularfeld -->
 	<div id="fieldpattern" class="row">
 		<div id="label" class="col-md-3"></div>
-		<div id="type" class="col-md-1"></div>
+		<div id="type" class="col-md-2"></div>
 		<div id="mandatory" class="col-md-1"></div>
-		<div id="options" class="col-md-5"></div>
+		<div id="options" class="col-md-4"></div>
 	</div>
 </div>
 <!-- Patterns End -->
@@ -80,14 +80,14 @@
 
 <!-- Lightbox start -->
 <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="lightbox" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="width: 936px;">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h1>XML-Model</h41>
       </div>
-      <div class="modal-body">
+      <div id="lightbox-body" class="modal-body">
         ...
       </div>
       <div class="modal-footer">
@@ -101,87 +101,110 @@
 
 <script type="text/javascript">
 
-var sectionno = 0;	//Zähler für Sektionen
-var fieldno   = 0;	//Zähler für Feldnummern
-
-//Klick auf 'XML-Model generieren'
-$("button#generate").click(function() {
-	$('#myModal').modal('show');
-	$.ajax({
-		  type: "GET",
-		  url: "generate.php",
-		  data:  $('#collect').serialize(),
-		  success: function (result) {
-			$('.modal-body').html(result);
-	      }
-		})
-	//$("#collect").submit();
-});
+var section			= 0;	//counter for sections
+var field			= 0;	//counter for fields
+var sectionbefore	= 0;	//variable to save previous sectionnumber
 
 //Klick auf 'Neue Sektion erstellen'
-$("button#newsection").click(function() {
-	sectionno++;
-	$("#section" + sectionbefore + " #newfield").remove();
-	var sectionbefore = sectionno-1;
-	$("#sectionpattern").clone().appendTo("#sections");
-	$("#sections #sectionpattern").attr("id","section"+sectionno);
-	$("#section" + sectionno + " legend").text("Sektion " + sectionno);
-	$("#section" + sectionno + " #addfield").click(function(){
-		addnewfield();
-	});
-	$("select#type").change(function(){
-		if($("select#type").val() == 'select'){
+$("button#newsection").click(function()
+{
+	sectionbefore	= section;
+	section			= section + 1;
+	
+	if($("div#section" + sectionbefore + " form#newfield").length != 0)
+	{
+		$("div#section" + sectionbefore + " form#newfield").remove();
+	}
+	
+	$("div#sectionpattern").clone().appendTo("div#sections");			//Clone pattern to sections
+	$("div#sections div#sectionpattern").attr("id","section"+section);	//Adjust attribut 'id'
+	$("div#section" + section + " legend").text("Sektion " + section);	//Rewrite section title
+
+	//Show input 'Optionen' if 'Type' == 'select' || 'radio' || 'checkbox'
+	$("select#type").change(function()
+	{
+		if($("select#type").val() == 'select')
+		{
 			$("input#options").css("display","block");
 		}
 	})
+	
+	//Activate button 'Formularfeld anlegen'
+	$("#section" + section + " #addfield").click(function()
+	{
+		addnewfield();
+	});
 });
 
-//Resets given form
-function resetForm(element) {
-	$(element).each(function(){
-		this.reset();
-	});
-}
-
-//Fieldtype: 'select' selected > show options input
-
-
-//Click button 'Formularfeld anlegen'
-//	- clones div model 'fieldnew'
-//	- change id to 'field[n]'
-//	- hides options input
-//	- 
-//	- delete
-function addnewfield() {
-	fieldno++;
-	$("#fieldpattern").clone().appendTo("#section" + sectionno +" #fields");
-	$("#fields #fieldpattern").attr("id","field" + fieldno);
-	copyItemsToDiv();
+function addnewfield()
+{
+	field = field + 1;
+	
+	//Clone pattern to fields and adjust attribut 'id'
+	$("div#fieldpattern").clone().appendTo("div#section" + section +" div#fields");
+	$("div#fields div#fieldpattern").attr("id","field" + field);
+	
+	copyInputs();
 	resetForm("form#newfield");
-	$("input#options").css("display","none");
-	$("input#label").focus();
+	
+	//Hide input 'Optionen' if displayed
+	if($("input#options").css("display") == 'block')
+	{
+		$("input#options").css("display","none");
+	}
+	
+	$("input#label").focus();	//Put cursor to input 'Bezeichnung
 }
 
-//Kopiert die eingegebenen Informationen in das neu angelegte Feld einer Sektion
-function copyItemsToDiv() {
-	var label = $("input#label").val();
-	var type  = $("select#type").val();
-	var mandatory = $("input#mandatory:checked").val();
-	var options = $("input#options").val();
+function copyInputs()
+{
+	var label		= $("input#label").val();
+	var type		= $("select#type").val();
+	var mandatory	= $("input#mandatory:checked").val();
+	var options		= $("input#options").val();
+	
+	//Change 'Pflichtfeld' value to '1' if checked and '0' if not
 	if(mandatory == "on") {
 		mandatory = "1";
 	} else {
 		mandatory = "0";
 	}
-	$("#section" + sectionno +" #field" + fieldno + " #label").text(label);
-	$("#section" + sectionno +" #field" + fieldno + " #type").text(type);
-	$("#section" + sectionno +" #field" + fieldno + " #mandatory").text(mandatory);
-	$("#section" + sectionno +" #field" + fieldno + " #options").text(options);
-	$("#collect").append('<input type="hidden" name="'+sectionno+'label'+fieldno+'" value="'+label+'">').append();
-	$("#collect").append('<input type="hidden" name="'+sectionno+'type'+fieldno+'" value="'+type+'">');
-	$("#collect").append('<input type="hidden" name="'+sectionno+'mandatory'+fieldno+'" value="'+mandatory+'">');
-	$("#collect").append('<input type="hidden" name="'+sectionno+'options'+fieldno+'" value="'+options+'">');
+	
+	//Display inputs in list > copy inputs to div#field
+	$("div#section" + section +" div#field" + field +" div#label").text(label);
+	$("div#section" + section +" div#field" + field +" div#type").text(type);
+	$("div#section" + section +" div#field" + field +" div#mandatory").text(mandatory);
+	$("div#section" + section +" div#field" + field +" div#options").text(options);
+	
+	//Copy inputs to form#collect
+	$("#collect").append('<input type="hidden" name="'+section+'label'+field+'" value="'+label+'">');
+	$("#collect").append('<input type="hidden" name="'+section+'type'+field+'" value="'+type+'">');
+	$("#collect").append('<input type="hidden" name="'+section+'mandatory'+field+'" value="'+mandatory+'">');
+	$("#collect").append('<input type="hidden" name="'+section+'options'+field+'" value="'+options+'">');
 }
+
+function resetForm(element) {
+	//reset all elements of the given form
+	$(element).each(function(){
+		this.reset();
+	});
+}
+
+$("button#generate").click(function()
+{
+	$("div#lightbox").modal('show');			//display lightbox
+	
+	$.ajax(
+	{
+		type: "GET",
+		url: "generate.php",
+		data:  $('#collect').serialize(),		//Send data from form#collect
+		success: function (result)
+		{
+			$('#lightbox-body').html(result);	//Display result in lightbox
+		}
+	});
+});
 </script>
 </body>
 </html>

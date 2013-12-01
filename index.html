@@ -10,6 +10,7 @@
 <script src="lib/jquery-2.0.3.min.js"></script>
 <script src="lib/bootstrap.min.js"></script>
 <script src="lib/modal.js"></script>
+<script src="lib/tooltip.js"></script>
 
 </head>
 
@@ -112,9 +113,13 @@ $("button#newsection").click(function()
 		$("div#section" + sectionbefore + " form#newfield").remove();
 	}
 	
-	$("div#sectionpattern").clone().appendTo("div#sections");			//Clone pattern to sections
-	$("div#sections div#sectionpattern").attr("id","section"+section);	//Adjust attribut 'id'
-	$("div#section" + section + " legend").text("Sektion " + section);	//Rewrite section title
+	$("div#sectionpattern")
+		.clone()
+		.appendTo("div#sections");			//Clone pattern to sections
+	$("div#sections div#sectionpattern")
+		.attr("id","section"+section);		//Adjust attribut 'id'
+	$("div#section" + section + " legend")
+		.text("Sektion " + section);		//Rewrite section title
 
 	//Show input 'Optionen' if 'Type' == 'select' || 'radio' || 'checkbox'
 	$("select#type").change(function()
@@ -134,22 +139,60 @@ $("button#newsection").click(function()
 
 function addnewfield()
 {
-	field = field + 1;
-	
-	//Clone pattern to fields and adjust attribut 'id'
-	$("div#fieldpattern").clone().appendTo("div#section" + section +" div#fields");
-	$("div#fields div#fieldpattern").attr("id","field" + field);
-	
-	copyInputs();
-	resetForm("form#newfield");
-	
-	//Hide input 'Optionen' if displayed
-	if($("input#options").css("display") == 'block')
+	if(validatenewfield() == true)
 	{
-		$("input#options").css("display","none");
+		field = field + 1;
+		
+		//Clone pattern to fields and adjust attribut 'id'
+		$("div#fieldpattern")
+			.clone()
+			.appendTo("div#section" + section +" div#fields");
+		$("div#fields div#fieldpattern")
+			.attr("id","field" + field);
+		
+		copyInputs();
+		resetForm("form#newfield");
+		
+		//Hide input 'Optionen' if displayed
+		if($("input#options").css("display") == 'block')
+		{
+			$("input#options").css("display","none");
+		}
+		
+		$("input#label").focus();	//Put cursor to input 'Bezeichnung
 	}
-	
-	$("input#label").focus();	//Put cursor to input 'Bezeichnung
+}
+
+function validatenewfield()
+{
+	if($("input#label").val() == "")
+	{
+		$("input#label")
+			.attr("title","Dieses Feld muss ausgefüllt sein")
+			.attr("data-placement","bottom")
+			.tooltip('show');
+		return false;
+	}
+	else if($("select#type").val() == "")
+	{
+		$("select#type")
+			.attr("title","Dieses Feld muss ausgefüllt sein")
+			.attr("data-placement","bottom")
+			.tooltip('show');
+		return false;
+	}
+	else if($("input#options").val() == "" && $("input#options").css("display") != 'none')
+	{
+		$("input#options")
+			.attr("title","Dieses Feld muss ausgefüllt sein")
+			.attr("data-placement","bottom")
+			.tooltip('show');
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 function copyInputs()
@@ -173,10 +216,14 @@ function copyInputs()
 	$("div#section" + section +" div#field" + field +" div#options").text(options);
 	
 	//Copy inputs to form#collect
-	$("#collect").append('<input type="hidden" name="'+section+'label'+field+'" value="'+label+'">');
-	$("#collect").append('<input type="hidden" name="'+section+'type'+field+'" value="'+type+'">');
-	$("#collect").append('<input type="hidden" name="'+section+'mandatory'+field+'" value="'+mandatory+'">');
-	$("#collect").append('<input type="hidden" name="'+section+'options'+field+'" value="'+options+'">');
+	$("#collect")
+		.append('<input type="hidden" name="'+section+'label'+field+'" value="'+label+'">');
+	$("#collect")
+		.append('<input type="hidden" name="'+section+'type'+field+'" value="'+type+'">');
+	$("#collect")
+		.append('<input type="hidden" name="'+section+'mandatory'+field+'" value="'+mandatory+'">');
+	$("#collect")
+		.append('<input type="hidden" name="'+section+'options'+field+'" value="'+options+'">');
 }
 
 function resetForm(element) {

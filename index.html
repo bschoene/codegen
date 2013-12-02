@@ -32,6 +32,10 @@
 	</div>
 </div>
 
+<!-- Formular - Datensätze sammeln -->
+<form id="collect" action="generate.php?download" method="post"></form>
+<!-- End Formular -->
+
 
 <!-- Patterns Start -->
 <div id="patterns" style="display: none;">
@@ -66,15 +70,11 @@
 	<div id="fieldpattern" class="row">
 		<div id="label" class="col-md-3"></div>
 		<div id="type" class="col-md-2"></div>
-		<div id="mandatory" class="col-md-1"></div>
+		<div id="mandatory" class="col-md-1" style="text-align: center;"></div>
 		<div id="options" class="col-md-4"></div>
 	</div>
 </div>
 <!-- Patterns End -->
-
-<!-- Formular - Datensätze sammeln -->
-<form id="collect"></form>
-<!-- End Formular -->
 
 
 <!-- Lightbox start -->
@@ -90,7 +90,7 @@
         ...
       </div>
       <div class="modal-footer" style="text-align: left;">
-        <button type="button" class="btn btn-default">Herunterladen</button>
+        <button id="download" type="button" class="btn btn-default">Herunterladen</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -239,7 +239,7 @@ $("button#generate").click(function()
 	
 	$.ajax(
 	{
-		type: "GET",
+		type: "POST",
 		url: "generate.php",
 		data:  $('#collect').serialize(),		//Send data from form#collect
 		success: function (result)
@@ -247,6 +247,12 @@ $("button#generate").click(function()
 			$('#lightbox-body').html(result);	//Display result in lightbox
 		}
 	});
+});
+
+$("button#download").click(function()
+{
+	$("div#lightbox").modal('show');			//display lightbox
+	$("form#collect").submit();					//submit form#collect
 });
 </script>
 </body>

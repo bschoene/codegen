@@ -1,6 +1,6 @@
 <?php
 
-$raw_data = $_GET;
+$raw_data = $_POST;
 
 $sections = array();
 $matches = array();
@@ -37,6 +37,14 @@ foreach($sections as $section)
 				$output.="\t\t<$information>\n";
 				$label = $information;
 			}
+			elseif($tag == 'options')
+			{
+				$options = explode(";", $information);
+				foreach($options as $option)
+				{
+					$output.="\t\t\t<option>$option</option>\n";
+				}
+			}
 			else
 			{			
 				$output.="\t\t\t<$tag>$information</$tag>\n";
@@ -49,10 +57,22 @@ foreach($sections as $section)
 }
 $output.="</form>";
 
-$output=htmlspecialchars($output);
-$output = str_replace("\n","<br />",$output);
-$output = str_replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;",$output);
-$output = "<code>$output</code>";
-echo $output;
+
+if(isset($_GET['download']))
+{
+	// Force download
+	header('Content-type: application/force-download');
+	// Rename to model.xml
+	header('Content-Disposition: attachment; filename="model.xml"');
+	echo $output;
+}
+else
+{
+	$output=htmlspecialchars($output);
+	$output = str_replace("\n","<br />",$output);
+	$output = str_replace("\t","&nbsp;&nbsp;&nbsp;&nbsp;",$output);
+	$output = "<code>$output</code>";
+	echo $output;
+}
 
 ?>

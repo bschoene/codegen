@@ -23,7 +23,7 @@
 	</header>
 	
 	<div class="container">
-		<div id="sections"><!-- Sektionen werden hier eingefügt: Klick 'Neue Sektion erstellen' --></div>
+		<div id="sections"><!-- insert new sections by clicking 'Neue Sektion erstellen' (line 106) --></div>
 		<hr>
 		<div class="row">
 			<div class="col-md-3"><button id="newsection" class="form-control btn btn-success">Neue Sektion erstellen</button></div>
@@ -32,10 +32,8 @@
 	</div>
 </div>
 
-<!-- Formular - Datensätze sammeln -->
+<!-- form - collecting information for model (line 237) -->
 <form id="collect" action="generate.php?download" method="post"></form>
-<!-- End Formular -->
-
 
 <!-- Patterns Start -->
 <div id="patterns" style="display: none;">
@@ -49,8 +47,8 @@
 			<div class="col-md-1">Pflichtfeld</div>
 			<div class="col-md-4">Optionen</div>
 		</div>
-		<div id="fields"><!-- Felder werden hier eingefügt: Klick 'Formularfeld anlegen' --></div>
-		<!-- newfield: Formular zum eingeben von Informationen zum Formularfeld -->
+		<div id="fields"><!-- insert new fields by clicking 'Formularfeld anlegen' (line 134) --></div>
+		<!-- newfield: form to insert formfield information for model -->
 		<form id="newfield">
 			<div class="row" style="margin-top: 20px;">
 				<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
@@ -64,9 +62,9 @@
 				<div class="col-md-2"><button id="addfield" class="form-control btn btn-info" type="button">Formularfeld anlegen</button></div>
 			</div>
 		</form>
-	</div>
+	</div><!-- /.sectionpattern -->
 
-	<!-- fieldpattern: Muster für einen Datensatz zu einem Formularfeld -->
+	<!-- fieldpattern: pattern for new formfield in list -->
 	<div id="fieldpattern" class="row">
 		<div id="label" class="col-md-3"></div>
 		<div id="type" class="col-md-2"></div>
@@ -78,7 +76,6 @@
 
 
 <!-- Lightbox start -->
-<!-- Modal -->
 <div id="lightbox" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="width: 936px;">
     <div class="modal-content">
@@ -102,11 +99,14 @@ var section			= 0;	//counter for sections
 var field			= 0;	//counter for fields
 var sectionbefore	= 0;	//variable to save previous sectionnumber
 
-//Klick auf 'Neue Sektion erstellen'
+/**
+ * This event gets triggered by clicking on
+ * button 'Neue Sektion erstellen'
+ */
 $("button#newsection").click(function()
 {
-	sectionbefore	= section;
-	section			= section + 1;
+	sectionbefore	= section;												//Transfer value to section before
+	section			= section + 1;											//Increasing counter by 1
 	
 	if($("div#section" + sectionbefore + " form#newfield").length != 0)
 	{
@@ -115,18 +115,18 @@ $("button#newsection").click(function()
 	
 	$("div#sectionpattern")
 		.clone()
-		.appendTo("div#sections");			//Clone pattern to sections
+		.appendTo("div#sections");											//Clone pattern to sections
 	$("div#sections div#sectionpattern")
-		.attr("id","section"+section);		//Adjust attribut 'id'
+		.attr("id","section"+section);										//Adjust attribut 'id'
 	$("div#section" + section + " legend")
-		.text("Sektion " + section);		//Rewrite section title
+		.text("Sektion " + section);										//Rewrite section title
 
 	//Show input 'Optionen' if 'Type' == 'select' || 'radio' || 'checkbox'
 	$("select#type").change(function()
 	{
 		if($("select#type").val() == 'select')
 		{
-			$("input#options").css("display","block");
+			$("input#options").css("display","block");						//show 'Optionen'
 		}
 	})
 	
@@ -137,6 +137,12 @@ $("button#newsection").click(function()
 	});
 });
 
+/**
+ * This functions validates inputs in form#newfield
+ *
+ * @param	none
+ * @return	none
+ */
 function addnewfield()
 {
 	if(validatenewfield() == true)
@@ -163,9 +169,16 @@ function addnewfield()
 	}
 }
 
+/**
+ * This functions validates inputs in form#newfield
+ * > if a field isn't filled in a tooltip appears with a info for the user
+ *
+ * @param	none
+ * @return	bool	true if valid, false if invalid
+ */
 function validatenewfield()
 {
-	if($("input#label").val() == "")
+	if($("input#label").val() == "")										//Check 'Bezeichnung'
 	{
 		$("input#label")
 			.attr("title","Dieses Feld muss ausgefüllt sein")
@@ -173,7 +186,7 @@ function validatenewfield()
 			.tooltip('show');
 		return false;
 	}
-	else if($("select#type").val() == "")
+	else if($("select#type").val() == "")									//Check 'Type'
 	{
 		$("select#type")
 			.attr("title","Dieses Feld muss ausgefüllt sein")
@@ -181,6 +194,7 @@ function validatenewfield()
 			.tooltip('show');
 		return false;
 	}
+	//Check if 'Optionen' is valid and displayed
 	else if($("input#options").val() == "" && $("input#options").css("display") != 'none')
 	{
 		$("input#options")
@@ -191,10 +205,21 @@ function validatenewfield()
 	}
 	else
 	{
+		//Hide tooltips
+		$("input#label").tooltip('hide');
+		$("select#type").tooltip('hide');
+		$("input#options").tooltip('hide');
 		return true;
 	}
 }
 
+/**
+ * This functions copies the input values to div#fields (line 52)
+ * and form#collect as hidden input
+ *
+ * @param	none
+ * @return	none
+ */
 function copyInputs()
 {
 	var label		= $("input#label").val();
@@ -226,6 +251,12 @@ function copyInputs()
 		.append('<input type="hidden" name="'+section+'options'+field+'" value="'+options+'">');
 }
 
+/**
+ * This functions resets a given form
+ * 
+ * @param	string	@element: form to reset
+ * @return	none
+ */
 function resetForm(element) {
 	//reset all elements of the given form
 	$(element).each(function(){
@@ -233,26 +264,34 @@ function resetForm(element) {
 	});
 }
 
+/**
+ * This event gets triggered by clicking on
+ * button 'XML-Model generieren'
+ */
 $("button#generate").click(function()
 {
-	$("div#lightbox").modal('show');			//display lightbox
+	$("div#lightbox").modal('show');									//display lightbox
 	
 	$.ajax(
 	{
 		type: "POST",
 		url: "generate.php",
-		data:  $('#collect').serialize(),		//Send data from form#collect
+		data:  $('#collect').serialize(),								//Send data from form#collect
 		success: function (result)
 		{
-			$('#lightbox-body').html(result);	//Display result in lightbox
+			$('#lightbox-body').html(result);							//Display result in lightbox
 		}
 	});
 });
 
+/**
+ * This event gets triggered by clicking on
+ * button 'Herunterladen'
+ */
 $("button#download").click(function()
 {
-	$("div#lightbox").modal('show');			//display lightbox
-	$("form#collect").submit();					//submit form#collect
+	$("div#lightbox").modal('show');									//display lightbox
+	$("form#collect").submit();											//submit form#collect
 });
 </script>
 </body>

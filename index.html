@@ -54,8 +54,13 @@
 				<div class="col-md-3"><input id="label" type="text" class="form-control"></div>
 				<div class="col-md-2"><select id="type" class="form-control">
 										<option></option>
-										<option>text</option>
-										<option value="select">select</option>
+										<option>string</option>
+										<option>phone</option>
+										<option>email</option>
+										<option>radio</option>
+										<option>checkbox</option>
+										<option>select</option>
+										<option>textarea</option>
 									  </select></div>
 				<div class="col-md-1"><input id="mandatory" type="checkbox" class="form-control"></div>
 				<div class="col-md-4"><input id="options" type="text" class="form-control" style="display: none;"></div>
@@ -95,46 +100,54 @@
 <!-- Lightbox end -->
 
 <script type="text/javascript">
-var section			= 0;	//counter for sections
-var field			= 0;	//counter for fields
-var sectionbefore	= 0;	//variable to save previous sectionnumber
-
+var section			= 0;		//counter for sections
+var field			= 0;		//counter for fields
+var sectionbefore	= 0;		//variable to save previous sectionnumber
+var sectionfilled	= true;		/* variable is false as long as there is no formfield in a section
+								   > needs to true to create first section                        */
 /**
  * This event gets triggered by clicking on
  * button 'Neue Sektion erstellen'
  */
 $("button#newsection").click(function()
 {
-	sectionbefore	= section;												//Transfer value to section before
-	section			= section + 1;											//Increasing counter by 1
-	
-	if($("div#section" + sectionbefore + " form#newfield").length != 0)
+	if(sectionfilled == true)
 	{
-		$("div#section" + sectionbefore + " form#newfield").remove();
-	}
-	
-	$("div#sectionpattern")
-		.clone()
-		.appendTo("div#sections");											//Clone pattern to sections
-	$("div#sections div#sectionpattern")
-		.attr("id","section"+section);										//Adjust attribut 'id'
-	$("div#section" + section + " legend")
-		.text("Sektion " + section);										//Rewrite section title
-
-	//Show input 'Optionen' if 'Type' == 'select' || 'radio' || 'checkbox'
-	$("select#type").change(function()
-	{
-		if($("select#type").val() == 'select')
+		sectionfilled = false;
+		
+		sectionbefore	= section;												//Transfer value to section before
+		section			= section + 1;											//Increasing counter by 1
+		
+		if($("div#section" + sectionbefore + " form#newfield").length != 0)
 		{
-			$("input#options").css("display","block");						//show 'Optionen'
+			$("div#section" + sectionbefore + " form#newfield").remove();
 		}
-	})
+		
+		$("div#sectionpattern")
+			.clone()
+			.appendTo("div#sections");											//Clone pattern to sections
+		$("div#sections div#sectionpattern")
+			.attr("id","section"+section);										//Adjust attribut 'id'
+		$("div#section" + section + " legend")
+			.text("Sektion " + section);										//Rewrite section title
 	
-	//Activate button 'Formularfeld anlegen'
-	$("#section" + section + " #addfield").click(function()
-	{
-		addnewfield();
-	});
+		//Show input 'Optionen' if 'Type' == 'select' || 'radio' || 'checkbox'
+		$("select#type").change(function()
+		{
+			if($("select#type").val() == 'select' ||
+			   $("select#type").val() == 'radio' ||
+			   $("select#type").val() == 'checkbox')
+			{
+				$("input#options").css("display","block");						//show 'Optionen'
+			}
+		})
+		
+		//Activate button 'Formularfeld anlegen'
+		$("#section" + section + " #addfield").click(function()
+		{
+			addnewfield();
+		});
+	}
 });
 
 /**
@@ -147,6 +160,7 @@ function addnewfield()
 {
 	if(validatenewfield() == true)
 	{
+		sectionfilled = true;
 		field = field + 1;
 		
 		//Clone pattern to fields and adjust attribut 'id'
@@ -205,10 +219,10 @@ function validatenewfield()
 	}
 	else
 	{
-		//Hide tooltips
-		$("input#label").tooltip('hide');
-		$("select#type").tooltip('hide');
-		$("input#options").tooltip('hide');
+		//Hide tooltips + delete tooltip attributes
+		$("input#label").tooltip('hide').removeAttr("data-original-title").removeAttr("data-placement");
+		$("select#type").tooltip('hide').removeAttr("data-original-title").removeAttr("data-placement");
+		$("input#options").tooltip('hide').removeAttr("data-original-title").removeAttr("data-placement");
 		return true;
 	}
 }
@@ -270,18 +284,31 @@ function resetForm(element) {
  */
 $("button#generate").click(function()
 {
-	$("div#lightbox").modal('show');									//display lightbox
-	
-	$.ajax(
+	//Check if a formfield got added
+	if(field > 0)
 	{
-		type: "POST",
-		url: "generate.php",
-		data:  $('#collect').serialize(),								//Send data from form#collect
-		success: function (result)
+		$("button#generate").tooltip('hide');							//hide tooltip
+		
+		$("div#lightbox").modal('show');								//display lightbox
+		
+		$.ajax(
 		{
-			$('#lightbox-body').html(result);							//Display result in lightbox
-		}
-	});
+			type: "POST",
+			url: "generate.php",
+			data:  $('#collect').serialize(),							//Send data from form#collect
+			success: function (result)
+			{
+				$('#lightbox-body').html(result);						//Display result in lightbox
+			}
+		});
+	}
+	else
+	{
+		$("button#generate")
+			.attr("title","Es wurde noch kein Feld angelegt")
+			.attr("data-placement","bottom")
+			.tooltip('show');
+	}
 });
 
 /**

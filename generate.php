@@ -35,13 +35,13 @@ $info   	= array();													//save preg_match 	  > line 36
 /* Sort raw_data into $sections */
 foreach($raw_data as $key=>$value)
 {
-	if(!empty($value))													//Value of variable not empty
+	if(!empty($value) || $value == "0")									//Value of variable not empty
 	{
 		preg_match_all('/\d+/', $key, $matches, PREG_PATTERN_ORDER);	//Get all numbers of $key
 		preg_match('/\D+/', $key, $info);								//Get letters of $key
 		$section_num	= $matches[0][0];								//get sectionno
 		$field_num	= $matches[0][1];									//get fieldno
-		$info		= $info[0];											//get info
+		$info		= $info[0];											//get info out of array
 		$sections[$section_num][$field_num][$info] = $value;			//sort information into 3d-array
 	}
 }
@@ -76,7 +76,6 @@ foreach($sections as $section)
 			{			
 				$output .= "\t\t\t<$tag>$information</$tag>\n";
 			}
-			
 		}
 		$output .= "\t\t</$label>\n";
 	}
